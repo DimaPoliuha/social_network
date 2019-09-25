@@ -1,10 +1,19 @@
-<h1>{{ post.post_title }}</h1>
-<h2>{{ post.post_text }}</h2>
-<p><strong>{{ post.likes_count }}</strong></p>
+{% extends "blog/base.html" %}
 
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+{% block title %}{{ post.post_title }}{% endblock %}
 
-<form action="{% url 'blog:like' post.id %}" method="post">
-{% csrf_token %}
-<input type="submit" value="Like">
-</form>
+{%  block content %}
+    <div class="blog-post">
+        <h2 class="blog-post-title">{{ post.post_title }}</h2>
+        <p class="blog-post-meta">{{ post.pub_date|date:"d F, Y" }}</p>
+        <p>{{ post.post_text }}</p>
+        <h3>Likes: </h3><p class="btn btn-primary">{{ likes_count }}</p>
+        <br>
+        {% if user_likes_this %}
+            <a class="btn btn-danger" href="{% url 'blog:like' post.id %}">Dislike</a>
+        {% else %}
+            <a class="btn btn-info" href="{% url 'blog:like' post.id %}">Like</a>
+        {% endif %}
+    </div>
+    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+{% endblock %}

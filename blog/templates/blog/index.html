@@ -1,9 +1,27 @@
-{% if latest_posts_list %}
-    <ul>
-    {% for post in latest_posts_list %}
-        <li><a href="{% url 'blog:detail' post.id %}">{{ post.post_title }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No posts are available.</p>
-{% endif %}
+{% extends "blog/base.html" %}
+
+{% block title %}Blog{% endblock %}
+
+
+{%  block content %}
+    {% if latest_posts_list %}
+        <div class="row mb-2">
+            {% for post in latest_posts_list %}
+                <div class="col-md-6">
+                    <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                        <div class="col p-4 d-flex flex-column position-static">
+                            <h3 class="mb-0">{{ post.post_title }}</h3>
+                            <div class="mb-1 text-muted">{{ post.pub_date|date:"d F, Y" }}</div>
+                            <a href="{% url "blog:detail" post.id %}" class="stretched-link">Continue reading</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+{#        <ul>#}
+{#            <li><a href="{% url 'blog:detail' post.id %}">{{ post.post_title }}</a></li>#}
+{#        </ul>#}
+    {% else %}
+        <p>No posts are available.</p>
+    {% endif %}
+{% endblock %}

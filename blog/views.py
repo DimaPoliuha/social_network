@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views import generic
 
-from .models import Post
+from .models import Like, Post
 
 
 class IndexView(generic.ListView):
@@ -13,21 +13,26 @@ class IndexView(generic.ListView):
 
     def get_queryset(self):
         """
-        Return the last five published posts (not including those set to be
+        Return the last published posts (not including those set to be
         published in the future).
         """
-        return Post.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[
-            :5
-        ]
+        return Post.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")
 
 
-class DetailView(generic.DetailView):
-    model = Post
-    template_name = "blog/detail.html"
+def detail(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    likes_count = post.like_set.count()
+    user_likes_this = True if post.like_set.filter(user=request.user) else False
+    context = {
+        "likes_count": likes_count,
+        "post": post,
+        "user_likes_this": user_likes_this,
+    }
+    return render(request, "blog/detail.html", context)
 
 
 def like(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-    post.likes_count += 1
-    post.save()
-    return HttpResponseRedirect(reverse("blog:detail", args=(post.id,)))
+    new_like, created = Like.objects.get_or_create(user=request.user, post_id=post_id)
+    if not created:
+        new_like.delete()
+    return HttpResponseRedirect(reverse("blog:detail", args=(post_id,)))
