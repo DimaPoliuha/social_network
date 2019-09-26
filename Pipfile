@@ -11,6 +11,10 @@ django = "*"
 pre-commit = "*"
 psycopg2 = "*"
 django-crispy-forms = "*"
+djangorestframework = "*"
+djangorestframework-simplejwt = "*"
+clearbit = "*"
+requests = "*"
 
 [dev-packages]
 black = "==19.3b0"
