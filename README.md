@@ -11,7 +11,9 @@ pipenv run pre-commit install -t pre-commit
 pipenv shell
 ```
 
-#### Create `.env` file in `social_network` folder
+You need to make migrations and create superuser/admin for server.
+
+You need to create `.env` file in `social_network` folder.
 ```.env
 DJANGO_SECRET_KEY="specify"
 DB_NAME="specify"
