@@ -4,9 +4,16 @@
 
 {%  block content %}
     <div class="blog-post">
+        {% if post.author == user %}
+            <a class="btn btn-secondary btn-sm" href="{% url 'blog:update' post.id %}">Update</a>
+            <a class="btn btn-danger btn-sm" href="{% url 'blog:delete' post.id %}">Delete</a>
+        {% endif %}
         <h2 class="blog-post-title">{{ post.post_title }}</h2>
         <p class="blog-post-meta">{{ post.pub_date|date:"d F, Y" }}</p>
         <p>{{ post.post_text }}</p>
+        {% if post.author %}
+            <a href="{% url "blog:user-posts" post.author.username %}">By {{ post.author }}</a>
+        {% endif %}
         <h3>Likes: </h3><p class="btn btn-primary">{{ likes_count }}</p>
         <br>
         {% if user.is_authenticated %}
