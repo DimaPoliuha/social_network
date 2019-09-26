@@ -9,6 +9,7 @@ app_name = "api"
 router = routers.DefaultRouter()
 router.register(r"posts", views.PostViewSet)
 router.register(r"users", views.UserViewSet)
+router.register(r"likes", views.LikeViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),

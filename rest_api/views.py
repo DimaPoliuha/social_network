@@ -1,9 +1,9 @@
 from django.contrib.auth.models import User
 from rest_framework import viewsets
 
-from blog.models import Post
+from blog.models import Like, Post
 
-from .serializers import PostSerializer, UserSerializer
+from .serializers import LikeSerializer, PostSerializer, UserSerializer
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -14,3 +14,8 @@ class PostViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+
+class LikeViewSet(viewsets.ModelViewSet):
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
