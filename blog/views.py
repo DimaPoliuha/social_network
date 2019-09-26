@@ -12,17 +12,16 @@ class IndexView(generic.ListView):
     context_object_name = "latest_posts_list"
 
     def get_queryset(self):
-        """
-        Return the last published posts (not including those set to be
-        published in the future).
-        """
         return Post.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")
 
 
 def detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
     likes_count = post.like_set.count()
-    user_likes_this = True if post.like_set.filter(user=request.user) else False
+    if request.user.is_authenticated:
+        user_likes_this = True if post.like_set.filter(user=request.user) else False
+    else:
+        user_likes_this = False
     context = {
         "likes_count": likes_count,
         "post": post,

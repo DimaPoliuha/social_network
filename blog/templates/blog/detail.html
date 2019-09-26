@@ -9,10 +9,12 @@
         <p>{{ post.post_text }}</p>
         <h3>Likes: </h3><p class="btn btn-primary">{{ likes_count }}</p>
         <br>
-        {% if user_likes_this %}
-            <a class="btn btn-danger" href="{% url 'blog:like' post.id %}">Dislike</a>
-        {% else %}
-            <a class="btn btn-info" href="{% url 'blog:like' post.id %}">Like</a>
+        {% if user.is_authenticated %}
+            {% if user_likes_this %}
+                <a class="btn btn-danger" href="{% url 'blog:like' post.id %}">Dislike</a>
+            {% else %}
+                <a class="btn btn-info" href="{% url 'blog:like' post.id %}">Like</a>
+            {% endif %}
         {% endif %}
     </div>
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
