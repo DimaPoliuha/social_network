@@ -31,23 +31,17 @@ def get_clearbit_data(email):
 
 
 def signup(request):
+    if request.user.is_authenticated:
+        return redirect("blog:index")
     if request.method == "POST":
         form = SignupForm(request.POST)
         if form.is_valid():
             email = request.POST.get("email")
-            first_name = request.POST.get("first_name")
-            last_name = request.POST.get("last_name")
             clear_first_name, clear_last_name = get_clearbit_data(email)
-            if not first_name and not last_name:
-                first_name, last_name = clear_first_name, clear_last_name
-            elif not first_name and last_name:
-                first_name = clear_first_name
-            elif first_name and not last_name:
-                last_name = clear_last_name
 
             form_values = request.POST.copy()
-            form_values["first_name"] = first_name
-            form_values["last_name"] = last_name
+            form_values["first_name"] = clear_first_name
+            form_values["last_name"] = clear_last_name
             form = SignupForm(form_values)
 
             user = form.save(commit=False)
