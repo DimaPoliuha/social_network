@@ -1,6 +1,7 @@
 import argparse
 import json
 import random
+import time
 from pathlib import Path
 
 from requests_api import create_like, create_post, get_posts_list, signin, signup
@@ -29,7 +30,7 @@ class AutomatedBot:
         self.login_users()
         self.create_posts()
         self.like_posts()
-        with open("auth_data.json", "w") as file:
+        with open(self.data_path / f"auth_data{time.time()}.json", "w") as file:
             json.dump(self.users_auth_data, file)
 
     def create_users(self):
@@ -102,6 +103,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     config_path = args.config_path
     data_path = args.data_path
+    data_path.mkdir(mode=0o777, exist_ok=True)
     with open(config_path, "r", encoding="utf-8") as parameter_file:
         bot_config = json.load(parameter_file)
     bot = AutomatedBot(data_path, **bot_config)
