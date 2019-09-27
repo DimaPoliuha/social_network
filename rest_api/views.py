@@ -6,6 +6,8 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework import viewsets
+from rest_framework.generics import CreateAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -14,22 +16,22 @@ from account.tokens import account_activation_token
 from account.views import get_clearbit_data
 from blog.models import Like, Post
 
-from .serializers import LikeSerializer, PostSerializer, UserSerializer
+from . import serializers
 
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by("-pub_date")
-    serializer_class = PostSerializer
+    serializer_class = serializers.PostInfoSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = serializers.UserInfoSerializer
 
 
 class LikeViewSet(viewsets.ModelViewSet):
     queryset = Like.objects.all()
-    serializer_class = LikeSerializer
+    serializer_class = serializers.LikeInfoSerializer
 
 
 class SignupView(APIView):
@@ -88,3 +90,8 @@ def api_account_activate(request, uidb64, token):
             status=200,
         )
     return JsonResponse({"status": "error", "message": "activation link invalid"})
+
+
+class PostCreationView(CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.PostSerializer

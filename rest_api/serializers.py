@@ -4,7 +4,7 @@ from rest_framework import serializers
 from blog.models import Like, Post
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserInfoSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name="api:user-detail")
 
     class Meta:
@@ -12,19 +12,25 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ("url", "id", "username", "first_name", "last_name")
 
 
-class PostSerializer(serializers.HyperlinkedModelSerializer):
+class PostInfoSerializer(serializers.HyperlinkedModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name="api:post-detail")
-    author = UserSerializer()
+    author = UserInfoSerializer()
 
     class Meta:
         model = Post
         fields = ("url", "id", "post_title", "post_text", "author", "pub_date")
 
 
-class LikeSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    post = PostSerializer()
+class LikeInfoSerializer(serializers.ModelSerializer):
+    user = UserInfoSerializer()
+    post = PostInfoSerializer()
 
     class Meta:
         model = Like
         fields = ("post", "user")
+
+
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ("post_title", "post_text")

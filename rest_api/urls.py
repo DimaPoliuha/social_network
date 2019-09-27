@@ -21,4 +21,5 @@ urlpatterns = [
         views.api_account_activate,
         name="activate",
     ),
+    path("posts/create", views.PostCreationView.as_view(), name="create"),
 ]
