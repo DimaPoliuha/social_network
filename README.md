@@ -73,5 +73,5 @@ http post http://127.0.0.1:8000/api/v1/token/ username="user" password="hfugrweh
 
 http post http://127.0.0.1:8000/api/v1/posts/create author="12314" post_text="post" post_title="test" "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTY5NTgyOTc5LCJqdGkiOiJjN2IyZTNiNjUwYzI0Y2ZmOWY1ODQwMzI0NThjNGI4MSIsInVzZXJfaWQiOjQ3fQ.3IO-T1XrcBThe5hYjU9ALkTrhtigFG1Bc1LHJUHysb8"
 
-http post http://127.0.0.1:8000/api/v1/posts/like user_id=47 post_id=46 "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTY5NTgzODkwLCJqdGkiOiI2MDAwN2E4YjZlYmE0NjNlOWI5OTQ3OThmNDM0NDlmNCIsInVzZXJfaWQiOjQ3fQ.YJj5t-QLH9qDda-Ou5qb_nEgo57YRjVSoHLokHgXnw8"
+http post http://127.0.0.1:8000/api/v1/posts/like user="admin" post_id=46 "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTY5NTgzODkwLCJqdGkiOiI2MDAwN2E4YjZlYmE0NjNlOWI5OTQ3OThmNDM0NDlmNCIsInVzZXJfaWQiOjQ3fQ.YJj5t-QLH9qDda-Ou5qb_nEgo57YRjVSoHLokHgXnw8"
 ```
