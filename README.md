@@ -67,6 +67,8 @@ Also, this application has following API endpoints:
 
 ## Examples
 ```shell script
+http post http://127.0.0.1:8000/api/v1/signup/ username="user" email="email@mail.com" password1="hfugrwehg324" password2="hfugrwehg324"
+
 http post http://127.0.0.1:8000/api/v1/token/ username="user" password="hfugrwehg324"
 
 http post http://127.0.0.1:8000/api/v1/posts/create author="12314" post_text="post" post_title="test" "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTY5NTgyOTc5LCJqdGkiOiJjN2IyZTNiNjUwYzI0Y2ZmOWY1ODQwMzI0NThjNGI4MSIsInVzZXJfaWQiOjQ3fQ.3IO-T1XrcBThe5hYjU9ALkTrhtigFG1Bc1LHJUHysb8"

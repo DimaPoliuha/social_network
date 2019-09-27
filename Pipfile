@@ -14,6 +14,7 @@ djangorestframework = "*"
 djangorestframework-simplejwt = "*"
 clearbit = "*"
 requests = "*"
+argparse = "*"
 
 [dev-packages]
 black = "==19.3b0"
