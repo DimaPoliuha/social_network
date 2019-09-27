@@ -29,9 +29,10 @@ def check_email_hunter(email):
     except requests.exceptions.RequestException:
         return "Bad response from hunter.io."
     response_data = response.json()
-    data = response_data["data"]
-    if not data["regexp"] or not data["smtp_server"]:
-        return "Specify correct email!"
+    if "data" in response_data:
+        data = response_data["data"]
+        if not data["regexp"] or not data["smtp_server"]:
+            return "Specify correct email!"
     return None
 
 

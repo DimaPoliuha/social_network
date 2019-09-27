@@ -6,9 +6,9 @@ from pathlib import Path
 import requests
 
 
-def create_password(passlen=8):
+def generate_text(text_len=8):
     s = "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()?"
-    return "".join(random.sample(s, passlen))
+    return "".join(random.sample(s, text_len))
 
 
 class AutomatedBot:
@@ -20,14 +20,17 @@ class AutomatedBot:
         self.max_posts_per_user = max_posts_per_user
         self.max_likes_per_user = max_likes_per_user
         self.users_auth_data = None
-        # self.number_of_posts = random.randint(0, max_posts_per_user)
-        # self.number_of_likes = random.randint(0, max_likes_per_user)
 
     def __str__(self):
         return f"AutomatedBot({self.data_path}, {self.number_of_users}, {self.max_posts_per_user}, {self.max_likes_per_user})"
 
     def __call__(self, *args, **kwargs):
         self.create_users()
+        self.login_users()
+        self.create_posts()
+        self.like_posts()
+        with open("auth_data.json", "w") as file:
+            json.dump(self.users_auth_data, file)
 
     def create_users(self):
         count = self.number_of_users
@@ -36,7 +39,7 @@ class AutomatedBot:
             bot_index = random.randint(0, 10000)
             username = f"bot{bot_index}"
             email = f"bot{bot_index}@gmail.com"
-            password = create_password()
+            password = generate_text()
             user = self.signup(username, email, password)
             if user:
                 if "status" in user:
@@ -49,8 +52,6 @@ class AutomatedBot:
                         }
                         users.append(user)
         self.users_auth_data = {"auth_data": users}
-        with open("auth_data.json", "w") as file:
-            json.dump(self.users_auth_data, file)
 
     def signup(self, username, email, password):
         req_params = {
@@ -64,7 +65,66 @@ class AutomatedBot:
                 "http://127.0.0.1:8000/api/v1/signup/", data=req_params
             )
             return response.json()
+        except requests.exceptions.RequestException:
+            return None
 
+    def login_users(self):
+        users_data = self.users_auth_data["auth_data"]
+        for index, user in enumerate(users_data):
+            response = self.signin(user["username"], user["password"])
+            self.users_auth_data["auth_data"][index]["access_token"] = response[
+                "access"
+            ]
+
+    def signin(self, username, password):
+        req_params = {"username": username, "password": password}
+        try:
+            response = requests.post(
+                "http://127.0.0.1:8000/api/v1/token/", data=req_params
+            )
+            return response.json()
+        except requests.exceptions.RequestException:
+            return None
+
+    def create_posts(self):
+        users_data = self.users_auth_data["auth_data"]
+        for user in users_data:
+            for _ in range(random.randint(0, self.max_posts_per_user)):
+                self.create_post(
+                    user["access_token"],
+                    user["username"],
+                    generate_text(10),
+                    generate_text(30),
+                )
+
+    def create_post(self, token, author, post_title, post_text):
+        hed = {"Authorization": f"Bearer {token}"}
+        req_params = {
+            "author": author,
+            "post_text": post_text,
+            "post_title": post_title,
+        }
+        try:
+            response = requests.post(
+                "http://127.0.0.1:8000/api/v1/posts/create",
+                data=req_params,
+                headers=hed,
+            )
+            return response.json()
+        except requests.exceptions.RequestException:
+            return None
+
+    def like_posts(self):
+        pass
+
+    def create_like(self, token, user_id, post_id):
+        hed = {"Authorization": f"Bearer {token}"}
+        req_params = {"user_id": user_id, "post_id": post_id}
+        try:
+            response = requests.post(
+                "http://127.0.0.1:8000/api/v1/posts/like", data=req_params, headers=hed
+            )
+            return response.json()
         except requests.exceptions.RequestException:
             return None
 

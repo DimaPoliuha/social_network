@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from account.forms import SignupForm, check_email_hunter
+from account.forms import SignupForm
 from account.tokens import account_activation_token
 from account.views import get_clearbit_data
 from blog.models import Like, Post
@@ -56,9 +56,8 @@ class SignupView(APIView):
     def post(self, request):
         form = SignupForm(data=request.data)
         email = request.data.get("email")
-        email_verification = check_email_hunter(email)
 
-        if form.is_valid() and email_verification is None:
+        if form.is_valid():
             clear_first_name, clear_last_name = get_clearbit_data(email)
 
             form_values = request.data.copy()
@@ -67,7 +66,7 @@ class SignupView(APIView):
             form = SignupForm(form_values)
 
             user = form.save(commit=False)
-            user.is_active = False
+            user.is_active = True
             user.save()
             current_site = get_current_site(request)
             mail_subject = "Activate your blog account."
@@ -90,8 +89,6 @@ class SignupView(APIView):
                 },
                 status=200,
             )
-        elif email_verification is not None:
-            return Response(email_verification, status=409)
         return Response(form.errors, status=409)
 
 
