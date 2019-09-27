@@ -3,7 +3,7 @@ import json
 import random
 from pathlib import Path
 
-import requests
+from requests_api import create_like, create_post, get_posts_list, signin, signup
 
 
 def generate_text(text_len=8):
@@ -40,7 +40,7 @@ class AutomatedBot:
             username = f"bot{bot_index}"
             email = f"bot{bot_index}@gmail.com"
             password = generate_text()
-            user = self.signup(username, email, password)
+            user = signup(username, email, password)
             if user:
                 if "status" in user:
                     if user["status"] == "success":
@@ -53,80 +53,33 @@ class AutomatedBot:
                         users.append(user)
         self.users_auth_data = {"auth_data": users}
 
-    def signup(self, username, email, password):
-        req_params = {
-            "username": username,
-            "email": email,
-            "password1": password,
-            "password2": password,
-        }
-        try:
-            response = requests.post(
-                "http://127.0.0.1:8000/api/v1/signup/", data=req_params
-            )
-            return response.json()
-        except requests.exceptions.RequestException:
-            return None
-
     def login_users(self):
         users_data = self.users_auth_data["auth_data"]
         for index, user in enumerate(users_data):
-            response = self.signin(user["username"], user["password"])
+            response = signin(user["username"], user["password"])
             self.users_auth_data["auth_data"][index]["access_token"] = response[
                 "access"
             ]
-
-    def signin(self, username, password):
-        req_params = {"username": username, "password": password}
-        try:
-            response = requests.post(
-                "http://127.0.0.1:8000/api/v1/token/", data=req_params
-            )
-            return response.json()
-        except requests.exceptions.RequestException:
-            return None
 
     def create_posts(self):
         users_data = self.users_auth_data["auth_data"]
         for user in users_data:
             for _ in range(random.randint(0, self.max_posts_per_user)):
-                self.create_post(
+                create_post(
                     user["access_token"],
                     user["username"],
                     generate_text(10),
                     generate_text(30),
                 )
 
-    def create_post(self, token, author, post_title, post_text):
-        hed = {"Authorization": f"Bearer {token}"}
-        req_params = {
-            "author": author,
-            "post_text": post_text,
-            "post_title": post_title,
-        }
-        try:
-            response = requests.post(
-                "http://127.0.0.1:8000/api/v1/posts/create",
-                data=req_params,
-                headers=hed,
-            )
-            return response.json()
-        except requests.exceptions.RequestException:
-            return None
-
     def like_posts(self):
-        pass
-
-    def create_like(self, token, user_id, post_id):
-        hed = {"Authorization": f"Bearer {token}"}
-        req_params = {"user_id": user_id, "post_id": post_id}
-        try:
-            response = requests.post(
-                "http://127.0.0.1:8000/api/v1/posts/like", data=req_params, headers=hed
-            )
-            return response.json()
-        except requests.exceptions.RequestException:
-            return None
+        users_data = self.users_auth_data["auth_data"]
+        posts = get_posts_list()
+        posts_id = [post["id"] for post in posts]
+        for user in users_data:
+            for _ in range(random.randint(0, self.max_likes_per_user)):
+                post_id = random.choice(posts_id)
+                create_like(user["access_token"], user["username"], post_id)
 
 
 if __name__ == "__main__":

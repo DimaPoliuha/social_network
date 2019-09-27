@@ -16,7 +16,7 @@ from account.views import get_clearbit_data
 from blog.models import Like, Post
 
 from . import serializers
-from .forms import PostForm
+from .forms import LikeForm, PostForm
 
 
 def api_account_activate(request, uidb64, token):
@@ -113,8 +113,9 @@ class LikeCreationView(APIView):
 
     def post(self, request):
         post_values = request.data.copy()
+        user = User.objects.get(username=post_values["user"])
         new_like, created = Like.objects.get_or_create(
-            user_id=post_values["user_id"], post_id=post_values["post_id"]
+            user_id=user.id, post_id=post_values["post_id"]
         )
         if not created:
             new_like.delete()
