@@ -22,4 +22,5 @@ urlpatterns = [
         name="activate",
     ),
     path("posts/create", views.PostCreationView.as_view(), name="create"),
+    path("posts/like", views.LikeCreationView.as_view(), name="like"),
 ]

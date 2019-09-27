@@ -28,9 +28,3 @@ class LikeInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
         fields = ("post", "user")
-
-
-class PostSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Post
-        fields = ("post_title", "post_text")

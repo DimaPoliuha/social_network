@@ -6,7 +6,6 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework import viewsets
-from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -18,6 +17,22 @@ from blog.models import Like, Post
 
 from . import serializers
 from .forms import PostForm
+
+
+def api_account_activate(request, uidb64, token):
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+        return JsonResponse(
+            {"status": "success", "message": "your email was confirmed successfully"},
+            status=200,
+        )
+    return JsonResponse({"status": "error", "message": "activation link invalid"})
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -77,22 +92,6 @@ class SignupView(APIView):
         return Response(form.errors)
 
 
-def api_account_activate(request, uidb64, token):
-    try:
-        uid = force_text(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
-    if user is not None and account_activation_token.check_token(user, token):
-        user.is_active = True
-        user.save()
-        return JsonResponse(
-            {"status": "success", "message": "your email was confirmed successfully"},
-            status=200,
-        )
-    return JsonResponse({"status": "error", "message": "activation link invalid"})
-
-
 class PostCreationView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -107,3 +106,17 @@ class PostCreationView(APIView):
             form.save()
             return Response(form.data)
         return Response(form.errors)
+
+
+class LikeCreationView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        post_values = request.data.copy()
+        new_like, created = Like.objects.get_or_create(
+            user_id=post_values["user_id"], post_id=post_values["post_id"]
+        )
+        if not created:
+            new_like.delete()
+            return JsonResponse({"status": "success", "message": "disliked"})
+        return JsonResponse({"status": "success", "message": "liked"})
