@@ -1,6 +1,11 @@
+import os
+
+import requests
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+
+email_hunter_api_key = os.getenv("EMAILHUNTER_API")
 
 
 class SignupForm(UserCreationForm):
@@ -21,10 +26,23 @@ class SignupForm(UserCreationForm):
 
     def clean_email(self):
         email = self.cleaned_data.get("email")
-
+        unique_email = False
         try:
             User.objects.get(email=email)
         except User.DoesNotExist:
-            return email
+            unique_email = True
+        if not unique_email:
+            raise forms.ValidationError("This email address is already in use.")
 
-        raise forms.ValidationError("This email address is already in use.")
+        req = {"api_key": email_hunter_api_key, "email": email}
+        try:
+            response = requests.get(
+                "https://api.hunter.io/v2/email-verifier", params=req
+            )
+        except requests.exceptions.RequestException:
+            raise forms.ValidationError("Bad response from hunter.io.")
+        response_data = response.json()
+        data = response_data["data"]
+        if not data["regexp"] and not data["smtp_server"]:
+            raise forms.ValidationError("Specify correct email!")
+        return email

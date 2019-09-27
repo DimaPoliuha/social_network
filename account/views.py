@@ -15,10 +15,14 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from .forms import SignupForm
 from .tokens import account_activation_token
 
+clearbit.key = os.getenv("CLEARBIT_API")
+
 
 def get_clearbit_data(email):
-    clearbit.key = os.getenv("CLEARBIT_API")
-    response = clearbit.Enrichment.find(email=email, stream=True)
+    try:
+        response = clearbit.Enrichment.find(email=email, stream=True)
+    except requests.exceptions.RequestException:
+        response = None
     name, surname = None, None
     if response is not None:
         name = response["person"]["name"]["givenName"]
@@ -26,35 +30,20 @@ def get_clearbit_data(email):
     return name, surname
 
 
-def emailhunter_check(email):
-    api_key = os.getenv("EMAILHUNTER_API")
-    req = {"api_key": api_key, "email": email}
-    try:
-        response = requests.get("https://api.hunter.io/v2/email-verifier", params=req)
-    except requests.exceptions.RequestException:
-        return False
-    response_data = response.json()
-    data = response_data["data"]
-    if data["regexp"] and data["smtp_server"]:
-        return True
-    else:
-        return False
-
-
 def signup(request):
     if request.method == "POST":
         form = SignupForm(request.POST)
-        email = request.POST.get("email")
-        email_check = emailhunter_check(email)
-        if form.is_valid() and email_check:
+        if form.is_valid():
+            email = request.POST.get("email")
             first_name = request.POST.get("first_name")
             last_name = request.POST.get("last_name")
+            clear_first_name, clear_last_name = get_clearbit_data(email)
             if not first_name and not last_name:
-                first_name, last_name = get_clearbit_data(email)
+                first_name, last_name = clear_first_name, clear_last_name
             elif not first_name and last_name:
-                first_name, _ = get_clearbit_data(email)
+                first_name = clear_first_name
             elif first_name and not last_name:
-                _, last_name = get_clearbit_data(email)
+                last_name = clear_last_name
 
             form_values = request.POST.copy()
             form_values["first_name"] = first_name
@@ -81,8 +70,6 @@ def signup(request):
                 f"{user}, please confirm your email to complete the registration",
             )
             return redirect("blog:index")
-        elif not email_check:
-            messages.warning(request, f"Specify correct email!")
     else:
         form = SignupForm()
     return render(request, "account/signup.html", {"form": form})
