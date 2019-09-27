@@ -25,8 +25,9 @@ def get_clearbit_data(email):
         response = None
     name, surname = None, None
     if response is not None:
-        name = response["person"]["name"]["givenName"]
-        surname = response["person"]["name"]["familyName"]
+        if response["person"] is not None:
+            name = response["person"]["name"]["givenName"]
+            surname = response["person"]["name"]["familyName"]
     return name, surname
 
 

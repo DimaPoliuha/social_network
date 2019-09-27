@@ -8,7 +8,6 @@ python_version = "3.7"
 
 [packages]
 django = "*"
-pre-commit = "*"
 psycopg2 = "*"
 django-crispy-forms = "*"
 djangorestframework = "*"

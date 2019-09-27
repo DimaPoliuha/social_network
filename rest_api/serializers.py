@@ -12,21 +12,6 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ("url", "id", "username", "first_name", "last_name")
 
 
-class SignUpSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ("email", "username", "password")
-
-    def create(self, validated_data):
-        password = validated_data.pop("password")
-        user = User.objects.create(**validated_data)
-        if password:
-            user.set_password(password)
-            user.is_staff = True
-            user.save()
-        return user
-
-
 class PostSerializer(serializers.HyperlinkedModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name="api:post-detail")
     author = UserSerializer()

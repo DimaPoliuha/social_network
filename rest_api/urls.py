@@ -13,6 +13,12 @@ router.register(r"likes", views.LikeViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
-    # path('token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    # path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
+    path("token/", jwt_views.TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("token/refresh/", jwt_views.TokenRefreshView.as_view(), name="token_refresh"),
+    path("signup/", views.SignupView.as_view(), name="signup"),
+    path(
+        "activate/<slug:uidb64>/<slug:token>/",
+        views.api_account_activate,
+        name="activate",
+    ),
 ]
