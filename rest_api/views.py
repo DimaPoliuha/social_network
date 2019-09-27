@@ -32,7 +32,9 @@ def api_account_activate(request, uidb64, token):
             {"status": "success", "message": "your email was confirmed successfully"},
             status=200,
         )
-    return JsonResponse({"status": "error", "message": "activation link invalid"})
+    return JsonResponse(
+        {"status": "error", "message": "activation link invalid"}, status=410
+    )
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -85,11 +87,12 @@ class SignupView(APIView):
                 {
                     "status": "success",
                     "message": "confirm your email to complete the registration",
-                }
+                },
+                status=200,
             )
         elif email_verification is not None:
-            return Response(email_verification)
-        return Response(form.errors)
+            return Response(email_verification, status=409)
+        return Response(form.errors, status=409)
 
 
 class PostCreationView(APIView):
@@ -104,8 +107,8 @@ class PostCreationView(APIView):
 
         if form.is_valid():
             form.save()
-            return Response(form.data)
-        return Response(form.errors)
+            return Response(form.data, status=200)
+        return Response(form.errors, status=409)
 
 
 class LikeCreationView(APIView):
@@ -118,5 +121,7 @@ class LikeCreationView(APIView):
         )
         if not created:
             new_like.delete()
-            return JsonResponse({"status": "success", "message": "disliked"})
-        return JsonResponse({"status": "success", "message": "liked"})
+            return JsonResponse(
+                {"status": "success", "message": "disliked"}, status=200
+            )
+        return JsonResponse({"status": "success", "message": "liked"}, status=200)
