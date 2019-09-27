@@ -35,7 +35,7 @@ def emailhunter_check(email):
         return False
     response_data = response.json()
     data = response_data["data"]
-    if data["regexp"] and not data["gibberish"] and data["smtp_server"]:
+    if data["regexp"] and data["smtp_server"]:
         return True
     else:
         return False
