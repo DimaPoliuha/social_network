@@ -5,8 +5,6 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from blog.models import Like, Post
-
 email_hunter_api_key = os.getenv("EMAILHUNTER_API")
 
 
@@ -63,10 +61,3 @@ class SignupForm(UserCreationForm):
         if check_email_response is not None:
             raise forms.ValidationError(check_email_response)
         return email
-
-
-# class PostForm(forms.ModelForm):
-#     post_text = forms.CharField(max_length=200)
-#     class Meta:
-#         model = Post
-#         fields = ('user', 'post_text')

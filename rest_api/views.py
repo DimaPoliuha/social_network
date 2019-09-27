@@ -17,6 +17,7 @@ from account.views import get_clearbit_data
 from blog.models import Like, Post
 
 from . import serializers
+from .forms import PostForm
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -92,6 +93,17 @@ def api_account_activate(request, uidb64, token):
     return JsonResponse({"status": "error", "message": "activation link invalid"})
 
 
-class PostCreationView(CreateAPIView):
+class PostCreationView(APIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = serializers.PostSerializer
+
+    def post(self, request):
+
+        post_values = request.data.copy()
+        user = User.objects.get(username=post_values["author"])
+        post_values["author"] = str(user.id)
+        form = PostForm(post_values)
+
+        if form.is_valid():
+            form.save()
+            return Response(form.data)
+        return Response(form.errors)
